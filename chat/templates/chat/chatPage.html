@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" 
+          content="IE=edge">
+    <meta name="viewport" 
+          content="width=device-width, 
+                   initial-scale=1.0">
+<style>
+	.popup {
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+        }
+        .popup-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888888;
+            width: 30%;
+            font-weight: bolder;
+        }
+        .popup-content button {
+            display: block;
+            margin: 0 auto;
+        }
+        .show {
+            display: block;
+        }
+        h1 {
+            color: green;
+        }
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+</style>
+<body>
+	<center><h1>Hello , Welcome to my chat site ! {{request.user}}</h1></center>
+	<br>
+	{% if request.user.is_authenticated %}
+	<center> Logout the chat Page <a href = "{% url 'logout-user' %}">Logout</a></center>
+	{% endif %}
+	<div
+	class="chat__item__container"
+	id="id_chat_item_container"
+	style="font-size: 20px"
+	>
+	<br />
+	<label class="switch">
+		<input type="checkbox"  id="myButton"  onchange="checkAll(this)" >
+		<span class="slider round"></span>
+	  </label>
+	  
+  <div id="myPopup" class="popup">
+	  <div class="popup-content">
+		  <h1 style="color:green;">
+			</h1>
+		  <p>TRUE</p>
+		  <button id="closePopup">
+				Close
+			</button>
+	  </div>
+  </div>
+
+  <div id="myPopups" class="popup">
+	  <div class="popup-content">
+		  <h1 style="color:green;">
+			</h1>
+		  <p>FALSE</p>
+		  <button id="closePopups">
+				Close
+			</button>
+	  </div>
+  </div>
+
+  <div id="myPopupss" class="popup">
+	  <div class="popup-content">
+		  <h1 style="color:green;">
+			</h1>
+		  <p>FALSEeee</p>
+		  <button id="closePopupss">
+				Close
+			</button>
+	  </div>
+  </div>
+
+
+
+	<input type="hidden" id="id_message_send_input" />
+	<br />
+	<br />
+	</div>
+	
+	<script>
+	const chatSocket = new WebSocket("ws://" + window.location.host + "/");
+	chatSocket.onopen = function (e) {
+		console.log("The connection was setup successfully !");
+	};
+	chatSocket.onclose = function (e) {
+		console.log("Something unexpected happened !");
+	};
+	/*document.querySelector("#id_message_send_input").focus();
+	document.querySelector("#id_message_send_input").onkeyup = function (e) {
+		if (e.keyCode == 13) {
+		document.querySelector("#myButton").click();
+		}
+	};*/
+	document.querySelector("#myButton").onclick = function (e) {
+	
+		if (myButton.checked) {
+      var messageInput = "ON";
+		
+    } else {
+		var messageInput = "OFF";
+      
+    };
+		chatSocket.send(JSON.stringify({ message: messageInput, username : "{{request.user.username}}"}));
+	};
+	chatSocket.onmessage = function (e) {
+		const data = JSON.parse(e.data);
+		if (data.message=="ON"){
+		myButton.checked = true;
+		document.querySelector("#id_message_send_input").value = "";
+		document.querySelector("#id_chat_item_container").appendChild(div);}
+		else{
+		myButton.checked = false;
+		document.querySelector("#id_message_send_input").value = "";
+		document.querySelector("#id_chat_item_container").appendChild(div);
+		}
+	};
+	
+
+        closePopup.addEventListener("click", function () {
+            myPopup.classList.remove("show");
+        });
+        closePopups.addEventListener("click", function () {
+            myPopups.classList.remove("show");
+        });
+        closePopupss.addEventListener("click", function () {
+            myPopupss.classList.remove("show");
+        });
+        /*window.addEventListener("click", function (event) {
+            if (event.target == myPopup) {
+                myPopup.classList.remove("show");
+            }
+        });*/
+	</script>
+</body>
+</html>
